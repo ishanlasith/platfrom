@@ -411,9 +411,536 @@ for((i=0; i<5; i++))
 	done
 
 
+***2023***
+Q1
+
+#!/bin/bash
+
+#File Operation
+FileOperationMenu(){
+	clear
+	echo "File Operation Menu"
+	echo
+	echo "a) List files and Directories with Details info"
+	echo "b) Show hidden Files"
+	echo "c) Display Human-readable size of files"
+	echo "d) List .txt file and .sh"
+	echo "e) Compress folder (exclude .text)"
+	echo "f) Go Back"
+
+	read -p "Enter Your Response: " Response
+	case $Response in
+		a) ListFilesDirectory ;;
+		b) ShowHidden;;
+		c) HumanReadable;;
+		d) ListTextSh;;
+		e) Compress;;
+		f) MainMenu;;
+		*) FileOperationMenu;;
+	esac
+}
+
+#File Operation sub function
+
+ListFilesDirectory(){
+	clear
+	ls -l
+	echo
+	echo "a) Go Back"
+	read -p "Enter Your Response: " Response
+	case $Response in
+		"a" )FileOperationMenu;;
+		   *)ListFilesDirectory;;
+	esac
+}
+ShowHidden(){
+	clear
+	ls -al
+	echo "a) Go Back"
+	read -p "Enter Your Response: " Response
+	case $Response in
+		"a" )FileOperationMenu;;
+		   *)ShowHidden;;
+	esac
+}
+HumanReadable(){
+	clear
+	ls -lh
+	echo "a) Go Back"
+	read -p "Enter Your Response: " Response
+	case $Response in
+		"a" )FileOperationMenu;;
+		   *)HumanReadable;;
+	esac
+}
+ListTextSh(){
+	clear
+	ls *.txt *.sh
+	echo "a) Go Back"
+	read -p "Enter Your Response: " Response
+	case $Response in
+		"a" )FileOperationMenu;;
+		   *)ListTextSh;;
+	esac
+} 
+Compress(){
+	clear
+	read -p "Enter Destination Folder: " folder
+	read -p "Enter a Name for Compress file: " compressFile
+	#
+	#c - Create file
+	#z - gzip
+	#v - outputing whether it create or not
+	#f - file
+	if [[ -d $folder ]]; then
+		tar -cznf "$compressFile.tar.gz" --exclude="*.txt" "$folder"
+		
+		echo "File Compressed!"
+	else
+		echo "Error while Compresed the file!"
+	fi
+	echo "a) Go Back"
+	read -p "Enter Your Response: " Response
+	case $Response in
+		"a" )FileOperationMenu;;
+		   *)Compress;;
+	esac
+}
+#File Manipulation
+FileManipulationMenu(){
+	clear
+	echo "a) Copy User Specified file or Directory to a Location"
+	echo "b) Rename file"
+	echo "c) Move All text file begin with temp to a location"
+	echo "d) Delete a File"
+	echo "e) Concat and Merge file"
+	echo "f) Go Back"
+
+	read -p "Enter Response: " Response
+	case $Response in
+		a) CopyFile ;;
+		b) Renamefile;;
+		c) MoveFile;;
+		d) DeleteFile;;
+		e) MergeFile;;
+		f) MainMenu;;
+		*) FileManipulationMenu;;
+	esac
+
+}
+#File Manipulation Sub functions
+CopyFile(){
+	clear
+	read -p "Enter Source Path: " source
+	read -p "Enter Destination Path: " destination
+
+	if [[ -f $destination ]];then
+		read -p "File already Exist. Do you wish to Overwrite (Y/N):  " Response
+		case $Response in
+			"Y" ) echo "File Overwritten!"
+				;;
+			"N" )echo "File Overwritten Failed"
+				;;
+			*) CopyFile;;
+		esac
+		
+	else
+		cp -r "$source" "$destination"
+		#if [[ $? -eq 0 ]]; then
+		if [[ -f $destination ]]; then
+			echo "Filed Copyied!"
+		else
+			echo "Failed Copying!"
+		fi
+	fi
+	echo "a) Go Back"
+	read -p "Enter Your Response: " input
+	case $input in
+		"a" )FileManipulationMenu;;
+		   *)CopyFile;;
+	esac
+
+}
+Renamefile(){
+	clear
+	read -p "Enter Source Path: " source
+	read -p "Enter file Name: " filename
+
+	
+
+	if [[ -e $source ]]; then
+		mv "$source" "$filename" 
+		echo "File Renamed!"
+	else
+		echo "Failed to Rename the File!"
+	fi
+	case $input in
+		"a" )FileManipulationMenu;;
+		   *)Renamefile;;
+	esac
+	echo "a) Go Back"
+	read -p "Enter Your Response: " input
+	case $input in
+		"a" )FileManipulationMenu;;
+		   *)Renamefile;;
+	esac
+
+}
+MoveFile(){
+	clear
+	read -p "Enter Source Path: " source
+	read -p "Enter file Name: " filename
+
+	if [[ -e $source ]]; then
+		mv "$source"/temp*.txt "$filename"
+		echo "File Moved"
+	else
+		echo "File Moved Failed!"
+	fi
+	echo "a) Go Back"
+	read -p "Enter Your Response: " input
+	case $input in
+		"a" )FileManipulationMenu;;
+		   *)MoveFile;;
+	esac
+
+}
+DeleteFile(){
+	clear
+	read -p "Enter Source Path: " file
+
+	read -p "are you sure you want to delete (Y/N): " confirm
+	if [[ "$confirm" -eq "Y" ]];then
+		rm $file
+		echo "file delete Succesfully"
+	else
+		echo "Deletion failed"
+	fi
+	echo "a) Go Back"
+	read -p "Enter Your Response: " input
+	case $input in
+		"a" )FileManipulationMenu;;
+		   *)DeleteFile;;
+	esac
+
+}
+MergeFile(){
+	clear
+	read -p "Enter Source1 Path: " file1
+	read -p "Enter Source2 Path: " file2
+
+	if [[ -f "$file1" && -f "$file2" ]]; then
+		cat "$file1" "$file2" >> merge.txt
+		echo "File Merged!"
+	else
+		echo "failed Merge!"
+	fi
+	echo "a) Go Back"
+	read -p "Enter Your Response: " input
+	case $input in
+		"a" )FileManipulationMenu;;
+		   *)MergeFile;;
+	esac
+}
+FileViewingMenu(){
+	clear
+	echo "a) View first 10 Lines"
+	echo "b) View 1MB Content"
+	echo "c) View Last 20 Lines"
+	echo "d) Append line of content to file"
+	echo "e) Search word in a file"
+	echo "f) Go Back"
+
+	read -p "Enter Response: " Response
+	case $Response in
+		a) Viewfirst10 ;;
+		b) View1MB;;
+		c) ViewLast20;;
+		d) AppenLine;;
+		e) Search;;
+		f) MainMenu;;
+		*) FileViewingMenu;;
+	esac
+}
+Viewfirst10(){
+	clear
+	read -p "Enter Source Path: " file
+	if [[ -e $file ]]; then
+		head -n 10 $file
+	else
+		echo "File Doesnt Exist"
+	fi
+	echo "a) Go Back"
+	read -p "Enter Your Response: " input
+	case $input in
+		"a" )FileViewingMenu;;
+		   *)Viewfirst10;;
+	esac
+}
+View1MB(){
+	clear
+	read -p "Enter Source Path: " file
+	if [[ -e $file ]]; then
+		head -c 1M $file
+	else
+		echo "File Doesnt Exist"
+	fi
+	echo "a) Go Back"
+	read -p "Enter Your Response: " input
+	case $input in
+		"a" )FileViewingMenu;;
+		   *)View1MB;;
+	esac
+}
+ViewLast20(){
+	clear
+	read -p "Enter Source Path: " file
+	if [[ -e $file ]]; then
+		tail -n 20 $file
+	else
+		echo "File Doesnt Exist"
+	fi
+	echo "a) Go Back"
+	read -p "Enter Your Response: " input
+	case $input in
+		"a" )FileViewingMenu;;
+		   *)ViewLast20;;
+	esac
+}
+AppenLine(){
+	clear
+	read -p "Enter Source Path: " file
+	read -p "Enter Line: " line
+	if [[ -e $file ]]; then
+		echo  "$line" >> "$file"
+		cat $file
+	else
+		echo "File Doesnt Exist"
+	fi
+
+	echo "a) Go Back"
+	read -p "Enter Your Response: " input
+	case $input in
+		"a" )FileViewingMenu;;
+		   *)AppenLine;;
+	esac
+}
+Search(){
+	clear
+	read -p "Enter Source Path: " file
+	read -p "Enter word to Search " word
+
+	if [[ -e $file ]]; then
+		grep -n "$word" "$file"
+		if [[ $? -eq 0 ]] ;then
+			echo "Word Found!"
+		else
+			echo "Word Not Found!"
+		fi
+		
+	else
+		echo "File Doesnt Exist"
+	fi
+
+	echo "a) Go Back"
+	read -p "Enter Your Response: " input
+	case $input in
+		"a" )FileViewingMenu;;
+		   *)AppenLine;;
+	esac
+}
+SystemInfoMenu(){
+	clear
+	echo "a)Show hardware Name" 
+	echo "b) Dispaly Operating System"
+	echo "c) Display Disk Space in Human Human-readable way"
+	echo "d) set Read Write permission for the owner of specif file"
+	echo "e) Recursivly Remove read,write,execute permission for others"
+	echo "f) Go Back"
+
+	read -p "Enter Response: " Response
+	case $Response in
+		a) hardwareName ;;
+		b) OperatingSystem;;
+		c) DiskSpace;;
+		d) OwnerPermission;;
+		e) PermissionForOthers;;
+		f) MainMenu;;
+		*) SystemInfoMenu;;
+	esac
+}
+hardwareName(){
+	clear
+	echo "Machine Hardware Name: "
+	uname -m
+
+	echo "a) Go Back"
+	read -p "Enter Your Response: " input
+	case $input in
+		"a" )SystemInfoMenu;;
+		   *)hardwareName;;
+	esac
+}
+OperatingSystem(){
+	clear
+	echo " Operating System Name: "
+	uname -0
+
+	echo "a) Go Back"
+	read -p "Enter Your Response: " input
+	case $input in
+		"a" )SystemInfoMenu;;
+		   *)OperatingSystem;;
+	esac
+}
+DiskSpace(){
+	clear
+	echo " Disk Space: "
+	df -h
+
+	echo "a) Go Back"
+	read -p "Enter Your Response: " input
+	case $input in
+		"a" )SystemInfoMenu;;
+		   *)OperatingSystem;;
+	esac
+}
+OwnerPermission(){
+	clear
+	read -p " Enter file Name: " file
+	
+	if [[ -e $file ]]; then
+		chmod u=rw,g=r,o=r "$file"
+		#u=rw granted read ad write permission to owner
+		#g=r granted read permission to group
+		#o=r granted read permission to others(non owners)
+	else 
+		echo "File Not found!"
+	fi
+	echo "a) Go Back"
+	read -p "Enter Your Response: " input
+	case $input in
+		"a" )SystemInfoMenu;;
+		   *)OwnerPermission;;
+	esac
+}
+PermissionForOthers(){
+	clear
+	read -p " Enter file Name: " file
+	
+	if [[ -e $file ]]; then
+		chmod -R o-rwx "$file"
+		#-R Recursivly change the permissiont to parent to sub folrders
+		#o -rwx reamove read write execute permission -> o for others
+
+	else
+		echo "file not found!"
+	fi
+	echo "a) Go Back"
+	read -p "Enter Your Response: " input
+	case $input in
+		"a" )SystemInfoMenu;;
+		   *)OwnerPermission;;
+	esac
+}
+MainMenu(){
+	clear
+	echo "Main Menu"
+	echo 
+	echo "1. File Operation"
+	echo "2. File Manipulation"
+	echo "3. File Content Viewing"
+	echo "4. System Information and file permission"
+	echo "5. Exit"
+
+	read -p "Enter Your Response: " Response;
+	case $Response in
+		"1") FileOperationMenu;;
+		"2") FileManipulationMenu;;
+		"3") FileViewingMenu;;
+		"4") SystemInfoMenu;;
+		"5") exit 0;;
+		  *) MainMenu;;
+	esac
+}
+MainMenu
 
 
+q2
+
+a. sum of prime numbers 100---------
+
+#!/usr/bin/bash
+
+sum=0
+
+for num in {1..100}; do
+    is_prime=1
+    if [ $num -eq 1 ]; then
+        is_prime=0
+    fi
+    for (( i=2; i<=num/2; i++ )); do
+        if [ $((num%i)) -eq 0 ]; then
+            is_prime=0
+            break
+        fi
+    done
+
+    if [ $is_prime -eq 1 ]; then
+        sum=$((sum + num))
+    fi
+done
+
+echo "Sum of prime numbers from 1 to 100 is: $sum"
+
+b. convert hours,minute,second-------
+
+#!/usr/bin/bash
+
+sum=0
+
+for num in {1..100}; do
+    is_prime=1
+    if [ $num -eq 1 ]; then
+        is_prime=0
+    fi
+    for (( i=2; i<=num/2; i++ )); do
+        if [ $((num%i)) -eq 0 ]; then
+            is_prime=0
+            break
+        fi
+    done
+
+    if [ $is_prime -eq 1 ]; then
+        sum=$((sum + num))
+    fi
+done
+
+echo "Sum of prime numbers from 1 to 100 is: $sum"
 
 
+c. 1 to 100 divisible by 3,5 and both----
+
+ #!/usr/bin/bash
 
 
+for num in {1..100}
+do
+	if [ $((num%5)) -eq 0 ] && [ $((num%3)) -eq 0 ]; 
+	then
+		echo "$num"
+		
+	fi
+
+done
+
+
+d. convert ASCII 
+
+#!/usr/bin/bash
+
+read -p "Enter a character: " char
+
+ascii_value=$(printf "%d" "'$char'")
+
+echo "The ASCII value of '$char' is $ascii_value."
